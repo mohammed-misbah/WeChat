@@ -1,6 +1,6 @@
 import json
 from django.shortcuts import render
-# from django.utils.safestring import mark_safe
+from django.utils.safestring import mark_safe
 
 
 def index(request):
@@ -8,7 +8,9 @@ def index(request):
 
 
 def room(request, room_name):
-    print("room name is", room_name)
-    return render(request, "chat/room.html", {
-        "room_name_json":room_name
-        })
+    return render(request, "chat/room.html", {"room_name": room_name})
+
+# def room(request, room_name):
+#     return render(request, 'chat/room.html', {
+#         'room_name_json': mark_safe(json.dumps(room_name)),
+#     })

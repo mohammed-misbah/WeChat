@@ -1,4 +1,6 @@
 from pathlib import Path
+import channels_redis
+
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -12,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-x(pj7=*9k2w))ar=(-2s%9gwq4p!5(=#2d(^21g&w@9jniu4y+"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -20,14 +22,15 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
+    "channels",
+    "chat",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "channels",
-    "chat",
 ]
 
 MIDDLEWARE = [
@@ -58,10 +61,12 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = "ChatBot.wsgi.application"
 
 # ASGI used for Django Channels
+WSGI_APPLICATION = "ChatBot.wsgi.application"
+
 ASGI_APPLICATION = "ChatBot.asgi.application"
+# ASGI_APPLICATION = "ChatBot.settings"
 
 
 # Database
@@ -79,11 +84,30 @@ DATABASES = {
 
 }
 
+
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
     },
 }
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [os.environ.get("REDIS_URL")],
+#         },
+#     },
+# }
+
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#     },
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -131,3 +155,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# from django.conf import settings
+
+# if 'WSGI_APPLICATION' in dir(settings):
+#     print("Using WSGI")
+# elif 'ASGI_APPLICATION' in dir(settings):
+#     print("Using ASGI")
+# else:
+#     print("No specific application interface detected")
+
+# # Print the actual application settings for verification
+# print("ASGI_APPLICATION:", getattr(settings, 'ASGI_APPLICATION', None))
+
+# print("WSGI_APPLICATION:", getattr(settings, 'WSGI_APPLICATION', None))
